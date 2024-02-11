@@ -1,112 +1,222 @@
 <!DOCTYPE html>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <title>Requirements</title>
+    <style>
+
+        hr.bold {
+            border-top: 3px solid #000;
+        }
+    </style>
 </head>
 <body>
-<div style="text-align: center;">
+<div class="text-center mx-3">
     <h2> PawsConnect</h2>
     <h3> Requirements Specification </h3>
     <h4>Authors: Ty Baker, Brandon Grimaldo, Daniel Rodas, Smirth Luciano Salinas</h4>
 </div>
-<hr>
-<div style="text-align: center;">
+<hr class="bold">
+<div class="text-center mx-3">
     <h2> Section 1: Overview</h2>
 </div>
-
-<p>
-    PawsConnect is a social media application that will allow users to create profiles for both themselves and the pets
-    they own. Much like Facebook, users will be able to add
-    'friends' for themselves and their pets. Users will be able to find one another and other pets via a search
-    function, and will be able to view their relationships via a
-    connections graph.
-</p>
-<hr>
-<br>
 <div>
-    <h2>Section 2: Database Representation</h2>
-    <p>
-        The database employed will be a version of SQLite that runs atop the Django framework. The following information
-        describes the entities that should be present in the
-        database, their attributes, and their relationships for clarity.
+    <p class="mx-3">
+        PawsConnect is a social media app that will allow pet owners, prospective pet owners, and pets to create and
+        maintain linked relationships, called "friendships." For brevity, in the document, we will refer to entities as
+        follows:
     </p>
-    <br>
-    <ol>
-        <li>
-            <strong>Entities and Attributes</strong>
-            <ul>
-                <li><strong>User Attributes:</strong> ID (PK), First Name, Last Name, Email Address, Phone Number, City,
-                    State, ZIP
-                    <ul>
-                        <li>Note: City, State, ZIP, and Passwords are stored in a secure manner, potentially in a
-                            separate entity or securely hashed within the User entity.
-                        </li>
-                    </ul>
-                </li>
-                <li><strong>Authentication</strong>
-                    <ul>
-                        <li>Attributes: User ID (FK), Hashed Password</li>
-                        <li>Note: This entity ensures that sensitive authentication details are stored separately for
-                            enhanced security.
-                        </li>
-                    </ul>
-                </li>
-                <li><strong>Pet Attributes:</strong> ID (PK), Name, Type (e.g., Cat, Dog, Lizard), Size (Small, Medium,
-                    Large), Owner ID (FK)
-                </li>
-                <li><strong>Post</strong>
-                    <ul>
-                        <li>Attributes: ID (PK), Content, UserID (FK, nullable), PetID (FK, nullable)</li>
-                        <li>Note: A Post can be linked to either a User or a Pet, allowing for posts to be attributed
-                            correctly.
-                        </li>
-                    </ul>
-                </li>
-                <li><strong>Profile Picture</strong>
-                    <ul>
-                        <li>Attributes: ID (PK), Image URL, UserID (FK, nullable), PetID (FK, nullable)</li>
-                        <li>Note: Similar to Post, a Profile Picture can be associated with either a User or a Pet.</li>
-                    </ul>
-                </li>
-                <li><strong>Friendship</strong>
-                    <ul>
-                        <li>Attributes: UserID1 (FK), UserID2 (FK)</li>
-                        <li>Note: This entity represents the bidirectional friendship between users.</li>
-                    </ul>
-                </li>
-                <li><strong>Pet Friends</strong>
-                    <ul>
-                        <li>Attributes: PetID1 (FK), PetID2 (FK)</li>
-                        <li>Note: This entity represents friendships or connections between pets, which can be
-                            independent of their owners.
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <strong>Relationships and Cardinalities</strong>
-            <ul>
-                <li>User to Authentication: One-to-One. Each User has one set of authentication credentials.</li>
-                <li>User to Pet: One-to-Many. A User can own multiple Pets, but each Pet has exactly one Owner.</li>
-                <li>User to Post: One-to-Many. Users can make multiple Posts, but each Post is made by one User.</li>
-                <li>Pet to Post: One-to-Many. Pets can be attributed multiple Posts, but each Post is attributed to one
-                    Pet.
-                </li>
-                <li>User to Profile Picture: One-to-One. Each User can have one Profile Picture.</li>
-                <li>Pet to Profile Picture: One-to-One. Each Pet can have one Profile Picture.</li>
-                <li>User to User (Friendship): Many-to-Many. Users can have multiple friends.</li>
-                <li>Pet to Pet (Pet Friends): Many-to-Many. Pets can have multiple pet friends.</li>
-                <li>User to Pet (Friendship): Many-to-Many. Users can add pets as friends independently of the pet's
-                    owner.
-                </li>
-            </ul>
-        </li>
-    </ol>
+    <ul>
+        <li>Human User: USER</li>
+        <li>Animal: PET</li>
+        <li>Database: DB</li>
+        <li>Human Friendship Connection: HFR</li>
+        <li>Human-Pet Friendship Connection: HPF</li>
+        <li>Pet-Pet Friendship Connection: PPF</li>
+    </ul>
+    <p class="mx-3">
+        A brief DB description is contained in the section that follows, representing the Key relationships
+        necessary for the maintenance of the friendship structure using a relational DB, along with a more
+        thorough description of the architecture necessary for functionality.
+    </p>
+    <p class="mx-3">
+        On an aggregate scale, PawsConnect is a social media application for people with animals. Users of the
+        application should be able to create profiles for themselves and their animals, update and edit these
+        profiles, and connect with other users. Support for traditional social media application activities such as
+        uploading and updating profile pictures for USER and PET must be included, along with the ability to create
+        and edit posts on a common feed that updates dynamically. However, PawsConnect will NOT
+        contain a messaging functionality.  In order to connect with other users, PawsConnect must support filtered
+        searching with the following parameters:
+    <ul>
+        <li>USER Name</li>
+        <li>PET Name</li>
+        <li>Type of Pet</li>
+        <li>Pet Size</li>
+    <li>Location
+        <ul>
+            <li class="text-dark italicize">City</li>
+            <li class="text-dark italicize">State</li>
+            <li class="text-dark italicize"> A 'within x miles' feature would be useful</li>
+        </ul>
+    </li>
+    <li>Age</li>
+    <li>Breed</li>
+    </ul>
 </div>
-<hr>
-<div>
+    <p class="mx-3"> USER should be able to vizualize their connection with other users via a
+        'my-connections' feature that will return a graphical representation of all HFR connections for the specific
+        USER. USER should be able to change the language their newsfeed appears in at will.
+    </p>
+<br>
+
+<hr class="bold">
+<br>
+<div class="mx-3">
+    <h2>Section 2: Database Representation</h2>
+    <p class="mx-3">
+        The database employed will be a version of SQLite that runs atop the Django framework. The following information
+        describes the entities that should be present in the database, their attributes, and their relationships for clarity.
+    </p>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Entity</th>
+                <th>Attributes</th>
+                <th>Relationships</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>User</td>
+                <td>
+                    <ul>
+                        <li>ID (PK)</li>
+                        <li>First Name</li>
+                        <li>Last Name</li>
+                        <li>Email Address</li>
+                        <li>Phone Number</li>
+                        <li>City</li>
+                        <li>State</li>
+                        <li>ZIP</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>One-to-One with Authentication</li>
+                        <li>One-to-Many with Pet</li>
+                        <li>One-to-Many with Post</li>
+                        <li>One-to-One with Profile Picture</li>
+                        <li>Many-to-Many with User (Friendship)</li>
+                        <li>Many-to-Many with Pet (Friendship)</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Authentication</td>
+                <td>
+                    <ul>
+                        <li>User ID (FK)</li>
+                        <li>Hashed Password</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>One-to-One with User</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Pet</td>
+                <td>
+                    <ul>
+                        <li>ID (PK)</li>
+                        <li>Name</li>
+                        <li>Type</li>
+                        <li>Size</li>
+                        <li>Owner ID (FK)</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>One-to-Many with User</li>
+                        <li>One-to-Many with Post</li>
+                        <li>One-to-One with Profile Picture</li>
+                        <li>Many-to-Many with Pet (Pet Friends)</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Post</td>
+                <td>
+                    <ul>
+                        <li>ID (PK)</li>
+                        <li>Content</li>
+                        <li>UserID (FK, nullable)</li>
+                        <li>PetID (FK, nullable)</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>One-to-Many with User</li>
+                        <li>One-to-Many with Pet</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Profile Picture</td>
+                <td>
+                    <ul>
+                        <li>ID (PK)</li>
+                        <li>Image URL</li>
+                        <li>UserID (FK, nullable)</li>
+                        <li>PetID (FK, nullable)</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>One-to-One with User</li>
+                        <li>One-to-One with Pet</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Friendship</td>
+                <td>
+                    <ul>
+                        <li>UserID1 (FK)</li>
+                        <li>UserID2 (FK)</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>Many-to-Many between Users</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Pet Friends</td>
+                <td>
+                    <ul>
+                        <li>PetID1 (FK)</li>
+                        <li>PetID2 (FK)</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li>Many-to-Many between Pets</li>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr class="bold mx-3">
+<div class="mx-3">
     <h2>Section 3: Functionality for User </h2>
     <ol>
         <li>
@@ -142,9 +252,6 @@
             </ul>
         </li>
     </ol>
-
-
 </div>
-
 </body>
 </html>
