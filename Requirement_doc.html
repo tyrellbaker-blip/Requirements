@@ -11,13 +11,104 @@
     <h4>Authors: Ty Baker, Brandon Grimaldo, Daniel Rodas, Smirth Luciano Salinas</h4>
 </div>
 <hr>
-<h2> Section 1: Overview</h2>
-<p>
-    PawsConnect is a social media application that will allow users to create profiles
-    for both themselves and the pets they own. Through the use of customized searching, users
-    will
-</p>2
+<div style="text-align: center;">
+    <h2> Section 1: Overview</h2>
+</div>
 
-<p></p>
+<p>
+    PawsConnect is a social media application that will allow users to create profiles for both themselves and the pets they own. Much like Facebook, users will be able to add
+    'friends' for themselves and their pets. Users will be able to find one another and other pets via a search function, and will be able to view their relationships via a
+    connections graph.
+</p>
+<hr>
+<br>
+    <div>
+        <h2>Section 2: Database Representation</h2>
+        <p>
+            The database employed will be a version of SQLite that runs atop the Django framework. The following information describes the entities that should be present in the
+            database, their attributes, and their relationships for clarity.
+        </p>
+        <br>
+        <ol>
+            <li>
+                <strong>Entities and Attributes</strong>
+                <ul>
+                    <li><strong>User Attributes:</strong> ID (PK), First Name, Last Name, Email Address, Phone Number, City, State, ZIP
+                        <ul>
+                            <li>Note: City, State, ZIP, and Passwords are stored in a secure manner, potentially in a separate entity or securely hashed within the User entity.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Authentication</strong>
+                        <ul>
+                            <li>Attributes: User ID (FK), Hashed Password</li>
+                            <li>Note: This entity ensures that sensitive authentication details are stored separately for enhanced security.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Pet Attributes:</strong> ID (PK), Name, Type (e.g., Cat, Dog, Lizard), Size (Small, Medium, Large), Owner ID (FK)</li>
+                    <li><strong>Post</strong>
+                        <ul>
+                            <li>Attributes: ID (PK), Content, UserID (FK, nullable), PetID (FK, nullable)</li>
+                            <li>Note: A Post can be linked to either a User or a Pet, allowing for posts to be attributed correctly.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Profile Picture</strong>
+                        <ul>
+                            <li>Attributes: ID (PK), Image URL, UserID (FK, nullable), PetID (FK, nullable)</li>
+                            <li>Note: Similar to Post, a Profile Picture can be associated with either a User or a Pet.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Friendship</strong>
+                        <ul>
+                            <li>Attributes: UserID1 (FK), UserID2 (FK)</li>
+                            <li>Note: This entity represents the bidirectional friendship between users.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Pet Friends</strong>
+                        <ul>
+                            <li>Attributes: PetID1 (FK), PetID2 (FK)</li>
+                            <li>Note: This entity represents friendships or connections between pets, which can be independent of their owners.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Relationships and Cardinalities</strong>
+                <ul>
+                    <li>User to Authentication: One-to-One. Each User has one set of authentication credentials.</li>
+                    <li>User to Pet: One-to-Many. A User can own multiple Pets, but each Pet has exactly one Owner.</li>
+                    <li>User to Post: One-to-Many. Users can make multiple Posts, but each Post is made by one User.</li>
+                    <li>Pet to Post: One-to-Many. Pets can be attributed multiple Posts, but each Post is attributed to one Pet.</li>
+                    <li>User to Profile Picture: One-to-One. Each User can have one Profile Picture.</li>
+                    <li>Pet to Profile Picture: One-to-One. Each Pet can have one Profile Picture.</li>
+                    <li>User to User (Friendship): Many-to-Many. Users can have multiple friends.</li>
+                    <li>Pet to Pet (Pet Friends): Many-to-Many. Pets can have multiple pet friends.</li>
+                    <li>User to Pet (Friendship): Many-to-Many. Users can add pets as friends independently of the pet's owner.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+<hr>
+<h2> Section 3: Functionality for Users</h2>
+<ol>
+    <li>
+        <strong> Create Account</strong>
+        <ul>
+         <li> This functionality allows users to create a username and password. This should also be the first place where the user can add their pet and pet photographs
+            to the
+            database, thereby creating a pet profile. Adding a pet should not be a requirement, because we will assume that people without pets but are looking to adopt can do
+            so by connecting with someone looking to put an animal up for adoption.
+
+
+
+    </li>
+</ol>
+<p>
+
+</p>
+
+<hr>
+
+<h2> Section 4: Functionality for Pets
+</h2>
 </body>
 </html>
