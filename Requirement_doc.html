@@ -37,10 +37,17 @@
         <li>Human-Pet Friendship Connection: HPF</li>
         <li>Pet-Pet Friendship Connection: PPF</li>
     </ul>
+
     <p class="mx-3">
         A brief DB description is contained in the section that follows, representing the Key relationships
         necessary for the maintenance of the friendship structure using a relational DB, along with a more
         thorough description of the architecture necessary for functionality.
+    </p>
+    <p class="mx-3">
+        The information needed by BD should be collected upon navigation to the web application's home page. From
+        there, users should have the option to log in or sign up. The sign up form should collect user information
+        and feed it to DB, ensuring that information that must be kept private is stored separately via
+        authentication protocol. Django provides the framework to accomplish this.
     </p>
     <p class="mx-3">
         On an aggregate scale, PawsConnect is a social media application for people with animals. Users of the
@@ -48,28 +55,28 @@
         profiles, and connect with other users. Support for traditional social media application activities such as
         uploading and updating profile pictures for USER and PET must be included, along with the ability to create
         and edit posts on a common feed that updates dynamically. However, PawsConnect will NOT
-        contain a messaging functionality.  In order to connect with other users, PawsConnect must support filtered
+        contain a messaging functionality. In order to connect with other users, PawsConnect must support filtered
         searching with the following parameters:
     <ul>
         <li>USER Name</li>
         <li>PET Name</li>
         <li>Type of Pet</li>
         <li>Pet Size</li>
-    <li>Location
-        <ul>
-            <li class="text-dark italicize">City</li>
-            <li class="text-dark italicize">State</li>
-            <li class="text-dark italicize"> A 'within x miles' feature would be useful</li>
-        </ul>
-    </li>
-    <li>Age</li>
-    <li>Breed</li>
+        <li>Location
+            <ul>
+                <li class="text-dark italicize">City</li>
+                <li class="text-dark italicize">State</li>
+                <li class="text-dark italicize"> A 'within x miles' feature would be useful</li>
+            </ul>
+        </li>
+        <li>Age</li>
+        <li>Breed</li>
     </ul>
 </div>
-    <p class="mx-3"> USER should be able to vizualize their connection with other users via a
-        'my-connections' feature that will return a graphical representation of all HFR connections for the specific
-        USER. USER should be able to change the language their newsfeed appears in at will.
-    </p>
+<p class="mx-3"> USER should be able to vizualize their connection with other users via a
+    'my-connections' feature that will return a graphical representation of all HFR connections for the specific
+    USER. USER should be able to change the language their newsfeed appears in at will.
+</p>
 <br>
 
 <hr class="bold">
@@ -79,6 +86,7 @@
         padding: .25rem;
         font-size: .875rem;
     }
+
     .table-container {
         width: auto;
         margin-left: 1rem;
@@ -89,8 +97,9 @@
 <div class="mx-3">
     <h2>Section 2: Database Representation</h2>
     <p class="mx-3">
-        The database employed will be a version of SQLite that runs atop the Django framework. The following information
-        describes the entities that should be present in the database, their attributes, and their relationships for clarity.
+        The database supports the pet social media app, featuring a connection graph that visually represents the
+        connections between users and their pets. Users can filter to view either their own connections or those of any
+        of their pets. The following entities, attributes, and relationships are crucial for this functionality.
     </p>
     <div class="table-container">
         <table class="table table-bordered compact-table">
@@ -104,43 +113,35 @@
             <tbody>
             <tr>
                 <td>User</td>
-                <td>ID (PK), First Name, Last Name, Email, Phone, City, State, ZIP</td>
-                <td>One-to-One with Auth, One-to-Many with Pet, Posts, Profile Pic; Many-to-Many with User, Pet</td>
-            </tr>
-            <tr>
-                <td>Authentication</td>
-                <td>User ID (FK), Hashed Password</td>
-                <td>One-to-One with User</td>
-            </tr>
-            <tr>
-                <td>Location</td>
-                <td>City(FK), State(FK), ZIP(FK)</td>
-                <td>One-to-One with User, One-to-One with Pet</td>
+                <td>ID (PK), Name, Age, City, State, ZIP</td>
+                <td>Owns Pets, User Friendships, Creates Posts, Part of ConnectionGraph</td>
             </tr>
             <tr>
                 <td>Pet</td>
-                <td>ID (PK), Name, Type, Size, Owner ID (FK)</td>
-                <td>One-to-Many with User, One-to-Many with Post, One-to-One with Profile Picture, Many-to-Many with Pet (Pet Friends)</td>
+                <td>ID (PK), Name, Age, Type, Breed, Owner ID (FK)</td>
+                <td>Owned by User, Pet Friendships, Associated with Posts, Part of ConnectionGraph</td>
             </tr>
             <tr>
                 <td>Post</td>
-                <td>ID (PK), Content, UserID (FK, nullable), PetID (FK, nullable)</td>
-                <td>One-to-Many with User, One-to-Many with Pet</td>
-            </tr>
-            <tr>
-                <td>Profile Picture</td>
-                <td>ID (PK), Image URL, UserID (FK, nullable), PetID (FK, nullable)</td>
-                <td>One-to-One with User, One-to-One with Pet</td>
+                <td>ID (PK), Content (Text, Image URL), Owner ID (FK, nullable), Pet ID (FK, nullable), Created At,
+                    Updated At
+                </td>
+                <td>Belongs to User or Pet, Editable, Deletable</td>
             </tr>
             <tr>
                 <td>Friendship</td>
-                <td>UserID1 (FK), UserID2 (FK)</td>
-                <td>Many-to-Many between Users</td>
+                <td>ID (PK), User ID1 (FK), User ID2 (FK)</td>
+                <td>Links Users, Part of ConnectionGraph</td>
             </tr>
             <tr>
-                <td>Pet Friends</td>
-                <td>PetID1 (FK), PetID2 (FK)</td>
-                <td>Many-to-Many between Pets</td>
+                <td>Pet Friendship</td>
+                <td>ID (PK), Pet ID1 (FK), Pet ID2 (FK)</td>
+                <td>Links Pets, Part of ConnectionGraph</td>
+            </tr>
+            <tr>
+                <td>ConnectionGraph</td>
+                <td>ID (PK), Entity ID (FK), Entity Type (User or Pet)</td>
+                <td>Visualizes connections between Users and Pets</td>
             </tr>
             </tbody>
         </table>
@@ -158,13 +159,16 @@
                     form and stored in the database for retrieval and authentication.
                 </li>
                 <li>
-                    NAME, EMAIL, LOCATION, and PASSWORD are not optional. Adding a pet at this stage should be optional, as people
+                    NAME, EMAIL, LOCATION, and PASSWORD are not optional. Adding a pet at this stage should be optional,
+                    as people
                     looking to adopt should be able to sign up as well.
                 </li>
                 <li>
                     If USER does have an animal, USER must submit
-                    information about the animal: name, age, type, breed. This information should be stored in the database
-                    as its own entity, generating a new PET in the database and storing USERID of the USER as its foreignkey
+                    information about the animal: name, age, type, breed. This information should be stored in the
+                    database
+                    as its own entity, generating a new PET in the database and storing USERID of the USER as its
+                    foreignkey
                     to establish ownership of the animal.
                 </li>
 
@@ -193,8 +197,10 @@
                 <li>A common feed should exist that makes it possible for users to post on a forum.
                 </li>
                 <li>
-                    This should be done using Django's syndication-feed-generating framework, which will take care of heavy-load issues under
-                    the hood like dynamic updating, post editability, and database attribution.</li>
+                    This should be done using Django's syndication-feed-generating framework, which will take care of
+                    heavy-load issues under
+                    the hood like dynamic updating, post editability, and database attribution.
+                </li>
                 <li>
                     Posts should be structured such that USER can write and edit the post if they choose.
                 </li>
@@ -213,7 +219,13 @@
 
 
             </ul>
-
+        <li>
+            <strong>Change Languages</strong>
+            <p>
+                USER should have the option to update the language their feed appears in. In order to accomplish this,
+                use Azure AI's Translator API. The API needs to be able to access the posts of USER to update the
+                displayed language.
+            </p>
         </li>
         <li>
             <strong>Search</strong>
@@ -230,7 +242,8 @@
 
             </ul>
 
-        </li><li>
+        </li>
+        <li>
             <strong>Connection Graph</strong>
             <ul>
                 <li>
@@ -246,12 +259,43 @@
                     will allow visualization of SQL queries. Therefore, FRIENDSHIP within DB should be queried,
                     returning all friendships associated with the given USER api. Only one Connection Graph can be
                     visualized at once, meaning USER should not be able to be shown the unique Connection Graph for
-                themselves and any of their associated PET objects at once. USER should, however, be able to select
-                between themselves and any associated PET objects and be returned a connection graph.
+                    themselves and any of their associated PET objects at once. USER should, however, be able to select
+                    between themselves and any associated PET objects and be returned a connection graph.
                 </li>
             </ul>
         </li>
     </ol>
+<hr class="bold mx-3">
+    <div class="mx-3">
+        <h2>Section 4: Other Requirements</h2>
+        <ol>
+
+            <li>
+                <strong>Security</strong>
+                <ul>
+                    User password and location information should be securely stored in the database. The bulk of
+                    this will be ensured by the Django framework.
+                </ul>
+            </li>
+            <li>
+                <strong>Ease of Use/Robustness</strong>
+                <ul>
+                    Going from section to section of the application should be seamless, and the functionality for
+                    dynamic refreshing of the user feed needs to be smooth -- the user experience should not be
+                    hindered by a refreshing process.
+                </ul>
+            </li>
+            <li>
+                <strong>Hosting</strong>
+                <ul>
+                    <li>
+                        PawsConnect is a web based application, which means it will need to be hosted on a server.
+                        Django provides a framework for server setup.
+                    </li>
+                </ul>
+            </li>
+        </ol>
+    </div>
 </div>
 </body>
 </html>
