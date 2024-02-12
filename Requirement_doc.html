@@ -74,14 +74,26 @@
 
 <hr class="bold">
 <br>
+<style>
+    .compact-table td, .compact-table th {
+        padding: .25rem;
+        font-size: .875rem;
+    }
+    .table-container {
+        width: auto;
+        margin-left: 1rem;
+        margin-right: auto;
+    }
+</style>
+
 <div class="mx-3">
     <h2>Section 2: Database Representation</h2>
     <p class="mx-3">
         The database employed will be a version of SQLite that runs atop the Django framework. The following information
         describes the entities that should be present in the database, their attributes, and their relationships for clarity.
     </p>
-    <div class="table-responsive">
-        <table class="table table-bordered">
+    <div class="table-container">
+        <table class="table table-bordered compact-table">
             <thead>
             <tr>
                 <th>Entity</th>
@@ -92,124 +104,43 @@
             <tbody>
             <tr>
                 <td>User</td>
-                <td>
-                    <ul>
-                        <li>ID (PK)</li>
-                        <li>First Name</li>
-                        <li>Last Name</li>
-                        <li>Email Address</li>
-                        <li>Phone Number</li>
-                        <li>City</li>
-                        <li>State</li>
-                        <li>ZIP</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>One-to-One with Authentication</li>
-                        <li>One-to-Many with Pet</li>
-                        <li>One-to-Many with Post</li>
-                        <li>One-to-One with Profile Picture</li>
-                        <li>Many-to-Many with User (Friendship)</li>
-                        <li>Many-to-Many with Pet (Friendship)</li>
-                    </ul>
-                </td>
+                <td>ID (PK), First Name, Last Name, Email, Phone, City, State, ZIP</td>
+                <td>One-to-One with Auth, One-to-Many with Pet, Posts, Profile Pic; Many-to-Many with User, Pet</td>
             </tr>
             <tr>
                 <td>Authentication</td>
-                <td>
-                    <ul>
-                        <li>User ID (FK)</li>
-                        <li>Hashed Password</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>One-to-One with User</li>
-                    </ul>
-                </td>
+                <td>User ID (FK), Hashed Password</td>
+                <td>One-to-One with User</td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td>City(FK), State(FK), ZIP(FK)</td>
+                <td>One-to-One with User, One-to-One with Pet</td>
             </tr>
             <tr>
                 <td>Pet</td>
-                <td>
-                    <ul>
-                        <li>ID (PK)</li>
-                        <li>Name</li>
-                        <li>Type</li>
-                        <li>Size</li>
-                        <li>Owner ID (FK)</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>One-to-Many with User</li>
-                        <li>One-to-Many with Post</li>
-                        <li>One-to-One with Profile Picture</li>
-                        <li>Many-to-Many with Pet (Pet Friends)</li>
-                    </ul>
-                </td>
+                <td>ID (PK), Name, Type, Size, Owner ID (FK)</td>
+                <td>One-to-Many with User, One-to-Many with Post, One-to-One with Profile Picture, Many-to-Many with Pet (Pet Friends)</td>
             </tr>
             <tr>
                 <td>Post</td>
-                <td>
-                    <ul>
-                        <li>ID (PK)</li>
-                        <li>Content</li>
-                        <li>UserID (FK, nullable)</li>
-                        <li>PetID (FK, nullable)</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>One-to-Many with User</li>
-                        <li>One-to-Many with Pet</li>
-                    </ul>
-                </td>
+                <td>ID (PK), Content, UserID (FK, nullable), PetID (FK, nullable)</td>
+                <td>One-to-Many with User, One-to-Many with Pet</td>
             </tr>
             <tr>
                 <td>Profile Picture</td>
-                <td>
-                    <ul>
-                        <li>ID (PK)</li>
-                        <li>Image URL</li>
-                        <li>UserID (FK, nullable)</li>
-                        <li>PetID (FK, nullable)</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>One-to-One with User</li>
-                        <li>One-to-One with Pet</li>
-                    </ul>
-                </td>
+                <td>ID (PK), Image URL, UserID (FK, nullable), PetID (FK, nullable)</td>
+                <td>One-to-One with User, One-to-One with Pet</td>
             </tr>
             <tr>
                 <td>Friendship</td>
-                <td>
-                    <ul>
-                        <li>UserID1 (FK)</li>
-                        <li>UserID2 (FK)</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>Many-to-Many between Users</li>
-                    </ul>
-                </td>
+                <td>UserID1 (FK), UserID2 (FK)</td>
+                <td>Many-to-Many between Users</td>
             </tr>
             <tr>
                 <td>Pet Friends</td>
-                <td>
-                    <ul>
-                        <li>PetID1 (FK)</li>
-                        <li>PetID2 (FK)</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul>
-                        <li>Many-to-Many between Pets</li>
-                    </ul>
-                </td>
+                <td>PetID1 (FK), PetID2 (FK)</td>
+                <td>Many-to-Many between Pets</td>
             </tr>
             </tbody>
         </table>
@@ -222,33 +153,102 @@
         <li>
             <strong> Create User Profile </strong>
             <ul>
-                USER should be able to navigate to a login page where their information is collected via an HTML
-                form and stored in the database for retrieval and authentication with an HTML form. NAME, EMAIL,
-                LOCATION, and PASSWORD are not optional. Adding a pet at this stage should be optional, as people
-                looking to adopt should be able to sign up as well. If USER does have an animal, USER must submit
-                information about the animal: name, age, type, breed. This information should be stored in the database
-                as its own entity, generating a new PET in the database and storing USERID of the USER as its foreignkey
-                to establish ownership of the animal.
+                <li>
+                    USER should be able to navigate to a login page where their information is collected via an HTML
+                    form and stored in the database for retrieval and authentication.
+                </li>
+                <li>
+                    NAME, EMAIL, LOCATION, and PASSWORD are not optional. Adding a pet at this stage should be optional, as people
+                    looking to adopt should be able to sign up as well.
+                </li>
+                <li>
+                    If USER does have an animal, USER must submit
+                    information about the animal: name, age, type, breed. This information should be stored in the database
+                    as its own entity, generating a new PET in the database and storing USERID of the USER as its foreignkey
+                    to establish ownership of the animal.
+                </li>
+
             </ul>
             <br>
         </li>
         <li>
             <strong>Create Pet Profile</strong>
-            <ul>USER should be able to, separately from the sign-in process, add a pet to their account at any
-                point. Users should also be able to edit the name of their existing pets in the database, but not
-                alter their petID. This should be done via a separate HTML form using Django's framework.
+            <ul>
+                <li>USER should be able to, separately from the sign-in process, add a PET to the account at any
+                    point.
+                </li>
+                <li>No matter when PET is added, the information collected should be the same -- name, age, breed
+                    and an optional photo. PET should be linked to the USERID of USER.
+                </li>
             </ul>
             <br>
         </li>
         <li>
             <strong>Create Posts(Owner)</strong>
+
             <ul>
-                A common feed should exist that makes it possible for users to post on a forum. This should be done
-                using Django's syndication-feed-generating framework, which will take care of heavy-load issues under
-                the hood like dynamic updating, post editability, and database attribution.
+                <li>
+                    Posts for both USER and PET should support displaying both text and photographs.
+                </li>
+                <li>A common feed should exist that makes it possible for users to post on a forum.
+                </li>
+                <li>
+                    This should be done using Django's syndication-feed-generating framework, which will take care of heavy-load issues under
+                    the hood like dynamic updating, post editability, and database attribution.</li>
+                <li>
+                    Posts should be structured such that USER can write and edit the post if they choose.
+                </li>
             </ul>
+        </li>
+        <li>
+            <strong>Create Posts(Pet)</strong>
             <ul>
-                Posts should be structured such that USER can write and edit the
+
+                <li>
+                    USER should be able to make posts on behalf of any PET associated with their unique USERID.
+                </li>
+                <li>
+                    These posts should be maintained by PET in the database, but accessible via USER.
+                </li>
+
+
+            </ul>
+
+        </li>
+        <li>
+            <strong>Search</strong>
+            <ul>
+                <li>
+                    USER should be able to search for any other USER by filtering for name, location, or type of
+                    animal owned
+                </li>
+
+                <li>
+                    USER should be able to search for PET by name, breed, age group, or location.
+                </li>
+
+
+            </ul>
+
+        </li><li>
+            <strong>Connection Graph</strong>
+            <ul>
+                <li>
+                    USER should be able to visualize a node-based graphical representation of their connections to
+                    owners and pets.
+                </li>
+
+                <li>
+                    USER should be able to filter and decide whether they want to see USER to USER, USER to PET, or
+                    USER and PET connection
+                </li>
+                <li> The visualization of the Connection Graph will use the APEX Graph Visualization API, which
+                    will allow visualization of SQL queries. Therefore, FRIENDSHIP within DB should be queried,
+                    returning all friendships associated with the given USER api. Only one Connection Graph can be
+                    visualized at once, meaning USER should not be able to be shown the unique Connection Graph for
+                themselves and any of their associated PET objects at once. USER should, however, be able to select
+                between themselves and any associated PET objects and be returned a connection graph.
+                </li>
             </ul>
         </li>
     </ol>
